@@ -12,7 +12,7 @@ transactions = TransactionGenerator
                                 .create_transactions
 
 p 'start writing to csv: ' + Time.new.to_s
-CSV.open('D:/Artsemi_Dzmitryieu/data2.csv', 'w') do |csv|
+CSV.open('D:/Artsemi_Dzmitryieu/data3.csv', 'w') do |csv|
   transactions.each do |v|
     csv << v.to_array
   end
