@@ -3,6 +3,9 @@ class Transaction
   attr_accessor :invoice_no, :stock_code, :description, :quantity,
                 :invoice_date, :unit_price, :customer_id, :user
 
+  # add invoice time
+  # add product name
+  
   def initialize(params={})
     @invoice_no = params[:invoice_no]
     @stock_code = params[:stock_code]

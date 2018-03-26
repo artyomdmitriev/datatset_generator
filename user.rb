@@ -30,8 +30,8 @@ class User
   def initialize()
     countries_pickup = Pickup.new(@@countries)
     @country = countries_pickup.pick.to_s
-    @first_name = FFaker::Name.name
-    @last_name = FFaker::Name.name
+    @first_name = FFaker::Name.first_name
+    @last_name = FFaker::Name.last_name
     @email = get_email
     @street_name = FFaker::Address.street_name
     @building = FFaker::Address.building_number
