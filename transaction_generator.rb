@@ -1,5 +1,6 @@
 require 'pickup'
 require_relative 'product.rb'
+require_relative 'products_generator.rb'
 
 class TransactionGenerator
   # the shop expands through time and its sales grow too
@@ -41,12 +42,11 @@ class TransactionGenerator
   def initialize(params={})
     @start_date = Date.new(params[:start_date][0], params[:start_date][1], params[:start_date][2])
     @end_date = Date.new(params[:end_date][0], params[:end_date][1], params[:end_date][2],)
-    @invoice_num_start = params[:invoice_num_start]
+    @invoice_num_start = 1
     @num_of_users = params[:num_of_users]
     @transactions = []
     @users = Pickup.new(create_users)
-    @products = create_orders
-    puts '//////////////////////' + @products.size.to_s
+    @products = ProductsGenerator.new(amount_of_products: 10_000).generate_products
   end
 
   def create_transactions()
@@ -59,7 +59,8 @@ class TransactionGenerator
       end
       @users.pick(random_amount_of_customers(date)).each do |usr|
         random_amount_of_transactions.times do
-          t = Transaction.new(invoice_no: @@invoice_prefixes[@@prefix_index] + ('%.6i' % @invoice_num_start), stock_code:500, description: 'desc', quantity: random_quntity_of_goods,
+          product = @products.sample
+          t = Transaction.new(invoice_no: @@invoice_prefixes[@@prefix_index] + ('%.6i' % @invoice_num_start), stock_code:500, description: product.product_id, quantity: random_quntity_of_goods,
                                            invoice_date: date, unit_price: 5.01, customer_id: 5, user: usr)
           @transactions << t
         end
@@ -79,7 +80,7 @@ class TransactionGenerator
   end
 
   def random_amount_of_customers date
-    aoc = Random.new.rand(800..1200)
+    aoc = Random.new.rand(1200..1400)
     aoc *= @@year_coefficients[date.year]
     unless date.year == 2014 && (date.month == 4 || date.month == 5 || date.month == 6)
       aoc *= @@month_coefficients[date.month]
@@ -96,16 +97,10 @@ class TransactionGenerator
   end
 
   def random_quntity_of_goods
-    Random.new.rand(1..3)
-  end
-
-  def create_orders
-    product_id = 1
-    csv_text = File.read('D:\Artsemi_Dzmitryieu\products.csv')
-    csv_products = CSV.parse(csv_text, headers: true)
-    csv_products.each do |row|
-      @products << Product.new(product_id: product_id, name: row.to_s)
-      product_id += 1
+    if Random.new.rand(5) == 0 && Random.new.rand(5) == 0
+      Random.new(1..3)
+    else
+      1
     end
   end
 end

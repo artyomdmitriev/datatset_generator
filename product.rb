@@ -3,7 +3,7 @@ class Product
 
   def initialize(params={})
     @product_id = params[:product_id]
-    @name = params[:product_id]
+    @name = params[:name]
   end
 
 end
