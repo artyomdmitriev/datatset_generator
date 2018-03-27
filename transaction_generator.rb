@@ -1,6 +1,7 @@
 require 'pickup'
 require_relative 'product.rb'
 require_relative 'products_generator.rb'
+require_relative 'users_loader.rb'
 
 class TransactionGenerator
   # the shop expands through time and its sales grow too
@@ -60,8 +61,9 @@ class TransactionGenerator
       @users.pick(random_amount_of_customers(date)).each do |usr|
         random_amount_of_transactions.times do
           product = @products.sample
-          t = Transaction.new(invoice_no: @@invoice_prefixes[@@prefix_index] + ('%.6i' % @invoice_num_start), stock_code:500, description: product.product_id, quantity: random_quntity_of_goods,
-                                           invoice_date: date, unit_price: 5.01, customer_id: 5, user: usr)
+          quantity_of_goods = random_quantity_of_goods
+          t = Transaction.new(invoice_no: @@invoice_prefixes[@@prefix_index] + ('%.6i' % @invoice_num_start), quantity: quantity_of_goods,
+                                           invoice_date: date, user_id: usr, product_id: product.product_id)
           @transactions << t
         end
         @invoice_num_start += 1
@@ -72,17 +74,14 @@ class TransactionGenerator
   end
 
   def create_users
-    users_arr = []
-    @num_of_users.times do |i|
-      users_arr << User.new
-    end
+    users_arr = load_users_array
     Hash[users_arr.collect { |item| [item, 1] } ]
   end
 
   def random_amount_of_customers date
     aoc = Random.new.rand(1200..1400)
     aoc *= @@year_coefficients[date.year]
-    unless date.year == 2014 && (date.month == 4 || date.month == 5 || date.month == 6)
+    unless (date.year == 2014 && (date.month == 4 || date.month == 5 || date.month == 6)) || (date.year == 2015 && (date.month == 2 || date.month == 3 || date.month == 4))
       aoc *= @@month_coefficients[date.month]
     end
     aoc.to_i
@@ -96,9 +95,9 @@ class TransactionGenerator
     end
   end
 
-  def random_quntity_of_goods
+  def random_quantity_of_goods
     if Random.new.rand(5) == 0 && Random.new.rand(5) == 0
-      Random.new(1..3)
+      Random.new.rand(1..3)
     else
       1
     end
