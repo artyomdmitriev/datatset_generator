@@ -4,7 +4,7 @@ require 'pickup'
 require 'benchmark'
 require_relative 'user'
 require_relative 'transaction'
-require_relative 'transaction_generator'
+require_relative 'transactions_generator'
 
 p 'start: ' + Time.new.to_s
 transactions = TransactionGenerator
