@@ -2,6 +2,7 @@ require 'pickup'
 require_relative 'product.rb'
 require_relative 'products_generator.rb'
 require_relative 'users_loader.rb'
+require_relative 'delivery_address.rb'
 
 class TransactionGenerator
   # the shop expands through time and its sales grow too
@@ -35,6 +36,16 @@ class TransactionGenerator
     12 => 1.152
   }
 
+  @@tax_coefficient_per_country = {
+    "United Kingdom" => 0.2,
+    "Germany" => 0.18,
+    "France" => 0.19,
+    "Denmark" => 0.11,
+    "Sweden" => 0.12,
+    "Canada" => 0.094,
+    "USA" => 0.05
+  }
+
   @@invoice_prefixes = ['AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AG', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ']
   @@prefix_index = 0
 
@@ -59,11 +70,15 @@ class TransactionGenerator
         p date.year
       end
       @users.pick(random_amount_of_customers(date)).each do |usr|
+        delivery_address = DeliveryAddress.new(country: usr[1].to_s).to_array
         random_amount_of_transactions.times do
           product = @products.sample
+          tax_amount = @@tax_coefficient_per_country[usr[1]]
           quantity_of_goods = random_quantity_of_goods
+          total_price = ((quantity_of_goods * product.price.to_f) + (tax_amount.to_f * (quantity_of_goods * product.price.to_f))).round(2)
           t = Transaction.new(invoice_no: @@invoice_prefixes[@@prefix_index] + ('%.6i' % @invoice_num_start), quantity: quantity_of_goods,
-                                           invoice_date: date, user_id: usr, product_id: product.product_id)
+                                          tax_amount: tax_amount.to_f, total_price: total_price,
+                                          invoice_date: date, user_id: usr[0].to_s, product_id: product.product_id, delivery_address: delivery_address)
           @transactions << t
         end
         @invoice_num_start += 1

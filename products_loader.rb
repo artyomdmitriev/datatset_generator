@@ -7,7 +7,7 @@ def load_products_array
   products_file = File.read('D:/Artsemi_Dzmitryieu/Module4/Exit_Task/dataset/products.csv')
   products_csv = CSV.parse(products_file, headers: true)
   products_csv.each do |row|
-    products << Product.new(product_id: row[0])
+    products << Product.new(product_id: row[0], name: row[1], price: row[2])
   end
   products
 end

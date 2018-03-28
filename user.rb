@@ -19,8 +19,9 @@ class User
 
   @@email_domains = {"@gmail.com": 15, 
                      "@yahoo.com": 10, 
-                     "@live.ru": 7, 
-                     "@outlook.com": 7, 
+                     "@live.com": 7, 
+                     "@outlook.com": 7,
+                     "@inbox.com": 7, 
                      "@aol.com": 3
                     }
 
@@ -29,7 +30,7 @@ class User
   @@years_hash = {}
 
   attr_accessor :country, :city, :first_name, :last_name, :email, :gender,
-                :street_name, :building_number, :date_of_birth, :user_id
+                :street_name, :building_number, :postal_code, :date_of_birth, :user_id
 
   def initialize(params={})
     @user_id = params[:user_id]
@@ -57,6 +58,7 @@ class User
       @city = FFaker::AddressUK.city
       @street_name = FFaker::AddressUK.street_name
       @building_number = FFaker::AddressUK.building_number
+      @postal_code = FFaker::AddressUK.zip_code
       @first_name = FFaker::Name.first_name
       @last_name = FFaker::Name.last_name
       @email = get_email
@@ -64,6 +66,7 @@ class User
       @city = FFaker::AddressDE.city
       @street_name = FFaker::AddressDE.street_name
       @building_number = FFaker::AddressDE.building_number
+      @postal_code = FFaker::AddressDE.zip_code
       @first_name = FFaker::NameDE.first_name
       @last_name = FFaker::NameDE.last_name
       @email = get_email
@@ -71,6 +74,7 @@ class User
       @city = FFaker::AddressFR.city
       @street_name = FFaker::AddressFR.street_name
       @building_number = FFaker::AddressFR.building_number
+      @postal_code = FFaker::AddressFR.zip_code
       @first_name = FFaker::NameFR.first_name
       @last_name = FFaker::NameFR.last_name
       @email = get_email
@@ -78,6 +82,7 @@ class User
       @city = FFaker::AddressDA.city
       @street_name = FFaker::AddressDA.street_name
       @building_number = FFaker::AddressDA.building_number
+      @postal_code = FFaker::AddressDA.zip_code
       @first_name = FFaker::NameDA.first_name
       @last_name = FFaker::NameDA.last_name
       @email = get_email
@@ -85,6 +90,7 @@ class User
       @city = FFaker::AddressSE.city
       @street_name = FFaker::AddressSE.street_name
       @building_number = FFaker::AddressSE.building_number
+      @postal_code = FFaker::AddressSE.zip_code
       @first_name = FFaker::NameSE.first_name
       @last_name = FFaker::NameSE.last_name
       @email = get_email
@@ -92,6 +98,7 @@ class User
       @city = FFaker::AddressCA.city
       @street_name = FFaker::AddressCA.street_name
       @building_number = FFaker::AddressCA.building_number
+      @postal_code = FFaker::AddressCA.zip_code
       @first_name = FFaker::Name.first_name
       @last_name = FFaker::Name.last_name
       @email = get_email
@@ -99,10 +106,12 @@ class User
       @city = FFaker::AddressUS.city
       @street_name = FFaker::AddressUS.street_name
       @building_number = FFaker::AddressUS.building_number
+      @postal_code = FFaker::AddressUS.zip_code
       @first_name = FFaker::Name.first_name
       @last_name = FFaker::Name.last_name
       @email = get_email
     end
+    @apartment = apartment
   end
 
   def create_dob
@@ -128,7 +137,22 @@ class User
     email += email_domains_pickup.pick.to_s
   end
 
+  def apartment
+    x = 4
+    r = rand(x)
+    if r == 0
+      ('A'..'Z').to_a[rand(26)] + ('%.3i' % rand(999))
+    elsif r == 1
+      ('%.3i' % rand(999))
+    elsif r == 2
+      ('%.3i' % rand(999)) + ('A'..'Z').to_a[rand(26)]
+    elsif r == 3
+      ('%.2i' % rand(99))
+    end
+  end
+
   def to_array
-    [@user_id, @first_name, @last_name, @gender, @email, @country, @city, @street_name, @building_number, @date_of_birth]
+    [@user_id, @first_name, @last_name, @gender, @email, @date_of_birth, @country, @city, 
+      @street_name, @building_number, @apartment, @postal_code]
   end
 end
