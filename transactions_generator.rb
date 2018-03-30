@@ -49,6 +49,7 @@ class TransactionGenerator
   @@invoice_prefixes = ['AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AG', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ']
   @@prefix_index = 0
 
+  @@delivery_addr = {n: 70, y:30}
   attr_accessor :start_date, :end_date, :invoice_num_start, :num_of_users, :transactions, :users
 
   def initialize(params={})
@@ -70,7 +71,10 @@ class TransactionGenerator
         p date.year
       end
       @users.pick(random_amount_of_customers(date)).each do |usr|
-        delivery_address = DeliveryAddress.new(country: usr[1].to_s).to_array
+        delivery_address = [nil, nil, nil, nil, nil, nil]
+        if delivery_address_exists?
+          delivery_address = DeliveryAddress.new(country: usr[1].to_s).to_array
+        end
         random_amount_of_transactions.times do
           product = @products.sample
           tax_amount = @@tax_coefficient_per_country[usr[1]]
@@ -103,9 +107,14 @@ class TransactionGenerator
   end
 
   def random_amount_of_transactions
-    if Random.rand(10) == 0 && Random.rand(10) == 0 && Random.rand(10) == 0 && Random.rand(10) == 0
-      Random.new.rand(6..10)
-    else
+  	a = Random.rand(10)
+  	b = Random.rand(10)
+  	c = Random.rand(10)
+    if a == 0 && b == 0
+      Random.new.rand(3..6)
+    elsif a == 0 && b == 0 && c == 0
+      Random.new.rand(6..15)
+  	else
       Random.new.rand(1..2)
     end
   end
@@ -115,6 +124,14 @@ class TransactionGenerator
       Random.new.rand(1..3)
     else
       1
+    end
+  end
+
+  def delivery_address_exists?
+    if Pickup.new(@@delivery_addr).pick == :n
+      false
+    else
+      true
     end
   end
 end

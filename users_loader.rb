@@ -9,7 +9,7 @@ def load_users_array
   users_csv.each do |row| 
     users << [row[0], row[6]]
   end
-  users[0..20000]
+  users
 end
 
 def load_users_csv

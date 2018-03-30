@@ -1,5 +1,7 @@
 require 'csv'
 require 'pickup'
+require_relative 'product'
+require_relative 'products_generator'
 
  #create price for product
 def load_products_array
@@ -13,26 +15,19 @@ def load_products_array
 end
 
 def load_products_csv
-  year_coefficients = {
-    5.99 => 20,
-    7.59 => 19,
-    8.99 => 17,
-    10.99 => 15,
-    13.59 => 13,
-    15.99 => 10,
-    17.59 => 8,
-    25.99 => 4,
-    51.95 => 1
-  }
-  pckp = Pickup.new(year_coefficients)
   prod_id = 1
+  products_basic = []
+  csv_basic = CSV.parse(File.read('D:\Artsemi_Dzmitryieu\Module4\Exit_Task\dataset\online_retail.csv'), headers: true)
+  csv_basic.each do |row|
+    products_basic << Product.new(id: prod_id, product_id: 'PROD' + ('%.6i' % prod_id), 
+                                  name: row.to_a[2][1].to_s.split.map(&:capitalize).join(' ')) unless row.nil?
+    prod_id += 1
+  end
+
+  products_full = ProductsGenerator.new(products: products_basic, max_prod_id: prod_id).generate_all_products
   CSV.open('D:/Artsemi_Dzmitryieu/Module4/Exit_Task/dataset/products.csv', 'w') do |csv|
-    csv_text = File.read('D:\Artsemi_Dzmitryieu\Module4\Exit_Task\dataset\online_retail.csv')
-    csv_products = CSV.parse(csv_text, headers: true)
-    csv << ['prod_id', 'prod_name', 'prod_price']
-    csv_products.each do |row|
-      csv << ['PROD' + ('%.6i' % prod_id), row.to_a[2][1].to_s.split.map(&:capitalize).join(' '), pckp.pick] unless row.nil?
-      prod_id += 1
+    products_full.each do |product|
+      csv << product.to_array_full
     end
   end
 end
